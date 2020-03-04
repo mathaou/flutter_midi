@@ -15,13 +15,13 @@ class FlutterMidi extends FlutterMidiPlatform {
   /// On iOS make sure to include the sound_font.SF2 in the Runner folder.
   /// This does not work in the simulator.
   @override
-  Future<String> prepare(
+  static Future<String> prepare(
       {@required ByteData sf2, String name = "instrument.sf2"}) async {
     if (kIsWeb) return _channel.invokeMethod('prepare_midi');
     File _file = await writeToFile(sf2, name: name);
     final String result =
         await _channel.invokeMethod('prepare_midi', {"path": _file.path});
-    print("Result: $result");
+    print("flutter_midi: Prepare $result");
     return result;
   }
 
@@ -29,7 +29,7 @@ class FlutterMidi extends FlutterMidiPlatform {
   /// On iOS make sure to include the sound_font.SF2 in the Runner folder.
   /// This does not work in the simulator.
   @override
-  Future<String> changeSound(
+  static Future<String> changeSound(
       {@required ByteData sf2, String name = "instrument.sf2"}) async {
     File _file = await writeToFile(sf2, name: name);
 
@@ -43,7 +43,7 @@ class FlutterMidi extends FlutterMidiPlatform {
 
   /// Unmute the device temporarly even if the mute switch is on or toggled in settings.
   @override
-  Future<String> unmute() async {
+  static Future<String> unmute() async {
     final String result = await _channel.invokeMethod('unmute');
     return result;
   }
@@ -51,7 +51,7 @@ class FlutterMidi extends FlutterMidiPlatform {
   /// Use this when stopping the sound onTouchUp or to cancel a long file.
   /// Not needed if playing midi onTap.
   @override
-  Future<String> stopMidiNote({
+  static Future<String> stopMidiNote({
     @required int midi,
   }) async {
     final String result =
@@ -63,9 +63,17 @@ class FlutterMidi extends FlutterMidiPlatform {
   /// Play a midi note in the range between 0-256
   /// Multiple notes can be played at once as seperate calls.
   @override
-  Future<String> playMidiNote({
+  static Future<String> playMidiNote({
     @required int midi,
   }) async {
     return await _channel.invokeMethod('play_midi_note', {"note": midi});
+  }
+
+  /// Play a MIDI file.
+  @override
+  static Future<String> playMidiFile({
+    @required String path,
+  }) async {
+    return await _channel.invokeMethod('play_midi_file', {"path": path});
   }
 }
