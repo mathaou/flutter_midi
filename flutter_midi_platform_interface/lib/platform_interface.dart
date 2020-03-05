@@ -54,9 +54,16 @@ class FlutterMidiPlatform extends PlatformInterface {
   }
   
   /// Play a MIDI file.
-  static Future<String> playMidiFile({
+  static Future<String> loadMidiFile({
     @required String path,
   }) async {
-    throw UnimplementedError('playMidiFile() has not been implemented.');
+    throw UnimplementedError('loadMidiFile() has not been implemented.');
+  }
+
+  /// Play the current MIDI file loaded.
+  static Future<String> playCurrentMidiFile({
+    @required double tempoFactor,
+  }) async {
+    throw UnimplementedError('playCurrentMidiFile() has not been implemented.');
   }
 }

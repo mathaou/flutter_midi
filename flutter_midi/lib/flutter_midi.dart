@@ -71,9 +71,16 @@ class FlutterMidi extends FlutterMidiPlatform {
 
   /// Play a MIDI file.
   @override
-  static Future<String> playMidiFile({
+  static Future<String> loadMidiFile({
     @required String path,
   }) async {
-    return await _channel.invokeMethod('play_midi_file', {"path": path});
+    return await _channel.invokeMethod('load_midi_file', {"path": path});
+  }
+  
+  /// Play the current MIDI file loaded.
+  static Future<String> playCurrentMidiFile({
+    @required double tempoFactor = 1,
+  }) async {
+    return await _channel.invokeMethod('play_current_midi_file', {"tempoFactor": tempoFactor});
   }
 }

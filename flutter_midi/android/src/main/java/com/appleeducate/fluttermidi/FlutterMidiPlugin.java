@@ -74,10 +74,36 @@ public class FlutterMidiPlugin implements MethodCallHandler {
         return null;
     }
 
-    private void playMidiFile(final String path) throws IOException, InvalidMidiDataException, MidiUnavailableException {
+    private void playCurrentMidiFile(final double tempoFactor) throws IOException, InvalidMidiDataException, MidiUnavailableException {
+        float factor = (float) tempoFactor;
+        System.out.println("Playing midi file with factor " + factor);
+        sequencer.setTempoFactor(factor);
+
         new Thread(new Runnable() {
             public void run() {
-                try {
+                // Start playing
+                sequencer.start();
+
+                while (true) {
+                    if (sequencer.isRunning()) {
+                        try {
+                            Thread.sleep(1000); // Check every second
+                            System.out.println("Sequencer");
+                        } catch (InterruptedException ignore) {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                sequencer.stop();
+                sequencer.close();
+            }
+        }).start();
+    }
+
+    private void loadMidiFile(final String path) throws IOException, InvalidMidiDataException, MidiUnavailableException {
                     String sf2 = "/data/user/0/com.example.play_music_along/app_flutter/instrument.sf2";
                     System.out.println("Loading sound file into Android native " + sf2);
                     File _file = new File(sf2);
@@ -118,42 +144,9 @@ public class FlutterMidiPlugin implements MethodCallHandler {
                     sequencer.open();
                     sequencer.setSequence(sequence);
 
-                    sequencer.setTempoFactor(0.5f);
-
                     if (sequencer.isOpen()) {
                         System.out.println("Sequencer is open");
-                    }
-
-                    // Start playing
-                    sequencer.start();
-
-                    while (true) {
-                        if (sequencer.isRunning()) {
-                            try {
-                                Thread.sleep(1000); // Check every second
-                                System.out.println("Sequencer");
-                            } catch (InterruptedException ignore) {
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-
-                    sequencer.stop();
-                    sequencer.close();
-                } catch (IOException e) {
-                    System.err.println("flutter_midi: Input/output exception, " + e.getMessage());
-                    e.printStackTrace();
-                } catch (MidiUnavailableException e) {
-                    System.err.println("flutter_midi: Midi device is not ready, " + e.getMessage());
-                    e.printStackTrace();
-                } catch (InvalidMidiDataException e) {
-                    System.err.println("flutter_midi: Invalid MID message, " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+                    };
     }
 
     @Override
@@ -178,8 +171,12 @@ public class FlutterMidiPlugin implements MethodCallHandler {
                     sendNoteMessage((int) call.argument("note"), ShortMessage.NOTE_OFF);
                     break;
 
-                case "play_midi_file":
-                    playMidiFile((String) call.argument("path"));
+                case "load_midi_file":
+                    loadMidiFile((String) call.argument("path"));
+                    break;
+
+                case "play_current_midi_file":
+                    playCurrentMidiFile((double) call.argument("tempoFactor"));
                     break;
             }
         } catch (IOException e) {

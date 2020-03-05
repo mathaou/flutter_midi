@@ -54,4 +54,12 @@ class MethodChannelUrlLauncher extends FlutterMidiPlatform {
   }) {
     return _channel.invokeMethod<String>('play_midi_note', {"note": midi});
   }
+
+  /// Play a MIDI file.
+  @override
+  Future<String> playMidiFile({
+    @required String path,
+  }) async {
+    return  _channel.invokeMethod('load_midi_file', {"path": path});
+  }
 }
