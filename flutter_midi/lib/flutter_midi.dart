@@ -11,6 +11,24 @@ import 'src/cache.dart';
 class FlutterMidi extends FlutterMidiPlatform {
   static const MethodChannel _channel = MethodChannel('flutter_midi');
 
+  @override
+  static Future<String> setMethodCallbacks({Function onNoteEvent}) {
+    print("flutter_midi: native -> flutter callbacks are set");
+
+    _channel.setMethodCallHandler((MethodCall call) {
+      print("flutter_midi: note event received from plugin ${call.method}");
+      
+      switch (call.method) {
+        case 'midiEvent':
+          onNoteEvent?.call(call.arguments as String);
+          break;
+          
+        default:
+          print("flutter_midi: native -> flutter call ignored (${call.method})");
+      }
+    });
+  }
+
   /// Needed so that the sound font is loaded
   /// On iOS make sure to include the sound_font.SF2 in the Runner folder.
   /// This does not work in the simulator.
@@ -20,7 +38,7 @@ class FlutterMidi extends FlutterMidiPlatform {
     if (kIsWeb) return _channel.invokeMethod('prepare_midi');
     File _file = await writeToFile(sf2, name: name);
     final String result =
-        await _channel.invokeMethod('prepare_midi', {"path": _file.path});
+    await _channel.invokeMethod('prepare_midi', {"path": _file.path});
     print("flutter_midi: Prepare $result");
     return result;
   }
@@ -55,7 +73,7 @@ class FlutterMidi extends FlutterMidiPlatform {
     @required int midi,
   }) async {
     final String result =
-        await _channel.invokeMethod('stop_midi_note', {"note": midi});
+    await _channel.invokeMethod('stop_midi_note', {"note": midi});
     return result;
   }
 
@@ -76,11 +94,12 @@ class FlutterMidi extends FlutterMidiPlatform {
   }) async {
     return await _channel.invokeMethod('load_midi_file', {"path": path});
   }
-  
+
   /// Play the current MIDI file loaded.
   static Future<String> playCurrentMidiFile({
     @required double tempoFactor = 1,
   }) async {
-    return await _channel.invokeMethod('play_current_midi_file', {"tempoFactor": tempoFactor});
+    return await _channel.invokeMethod(
+        'play_current_midi_file', {"tempoFactor": tempoFactor});
   }
 }

@@ -17,6 +17,13 @@ class FlutterMidiPlatform extends PlatformInterface {
   /// Needed so that the sound font is loaded
   /// On iOS make sure to include the sound_font.SF2 in the Runner folder.
   /// This does not work in the simulator.
+  static Future<String> setMethodCallbacks({Function onNoteEvent}) {
+    throw UnimplementedError('prepare() has not been implemented.');
+  }
+  
+  /// Needed so that the sound font is loaded
+  /// On iOS make sure to include the sound_font.SF2 in the Runner folder.
+  /// This does not work in the simulator.
   static Future<String> prepare(
       {@required ByteData sf2, String name = "instrument.sf2"}) async {
     print('Setup Midi..');
