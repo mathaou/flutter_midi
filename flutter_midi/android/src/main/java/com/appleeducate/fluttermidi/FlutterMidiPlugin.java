@@ -54,19 +54,7 @@ public class FlutterMidiPlugin implements MethodCallHandler {
             if (message instanceof ShortMessage) {
                 ShortMessage shortMessage = (ShortMessage) message;
                 int cmd = shortMessage.getCommand();
-                // System.out.println("------------------- midi message cmd " + cmd + " " + ShortMessage.NOTE_ON);
-                String event = "";
-                switch (cmd) {
-                    case ShortMessage.NOTE_ON:
-                        event = "NOTE_ON";
-                        break;
-                    case ShortMessage.NOTE_OFF:
-                        event = "NOTE_OFF";
-                        break;
-                    default:
-                        break;
-                }
-                final String eventToSend = event;
+                final byte[] eventToSend = message.getMessage();
                 uiThreadHandler.post(new Runnable() {
                     @Override
                     public void run () {
